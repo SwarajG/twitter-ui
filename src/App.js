@@ -1,23 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import { getCookie, deleteCookie } from "./utils/cookieHelper";
+import { useEffect, useState } from "react";
+import "./App.css";
 
 function App() {
+  const [user, setUser] = useState({});
+  const onGoogleClick = () => {
+    window.open("http://localhost:3000/v1/auth/google", "_self");
+  };
+  useEffect(async () => {
+    const response = await axios.get(
+      `http://localhost:3000/v1/users/${getCookie("user_id")}`
+    );
+    setUser(response.data);
+  }, []);
+  const onLogoutClick = () => {
+    deleteCookie("authorization");
+    deleteCookie("refresh_token");
+    deleteCookie("user_id");
+    window.location.reload();
+  };
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>Hello {user.name}</h1>
+      <button onClick={onGoogleClick}>Google Login</button>
+      <button onClick={onLogoutClick}>Logout</button>
     </div>
   );
 }
